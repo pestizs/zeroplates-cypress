@@ -1,0 +1,45 @@
+{
+    "LoginSuccess": "You have successfully logged in!",
+    "LogoutSuccess": "You have successfully logged out!",
+    "InvalidCredentials": "Invalid e-mail or Password!",
+
+    "RegisterSuccess": "You have successfully registered!",
+    "MissingEmail": "Please enter your email address!",
+    "MissingUsername": "Please enter a username!",
+    "InvalidEmail":"Please enter a valid email address! Example: 'xxx@xxx.com'.",
+    "MissingPassword":"Please enter a password!",
+    "MissingRepeatPassword":"Please enter your password again!",
+    "PasswordsDontMatch":"Passwords don't match!",
+    "MissingCheckbox":"Please accept Privacy Policy and the Terms of Service!",
+    "ShortUsername" : "Username length must be at least 5 characters long",
+    "ShortPassword" : "Password should be at least 6 characters long",
+    "PasswordUpperCase" : "Password should contain at least 1 upper-cased letter",
+    "PasswordLowerCase" : "Password should contain at least 1 lower-cased letter",
+    "PasswordNumber" : "Password should contain at least 1 number",
+    "PasswordSymbol": "Password should contain at least 1 symbol",
+    "EmailExists" : "E-mail already exists! Please try again with a different one.",
+    "UsernameExists" : "Username already exists! Please try again with a different one.",
+
+    "MessageSent" : "Message sent!",
+
+    "InvalidRegNum": "This registration number does not exist! Please try a different one.",
+    "SearchSuccess": "Search was successfull!",
+    "VehicleSaved": "Vehicle details have been saved!",
+
+    "DeleteSuccess" : "Saved vehicle has been deleted!",
+
+    "RepAddedSuccess" : "Representative has been added!",
+    "RepDeletedSuccess" : "Representative has been deleted!",
+    "RepUpdatedSuccess" : "Representative has been updated!",
+
+    "FirstNameShort" : "First Name length must be at least 2 characters long",
+    "FirstNameEmpty" : "First Name is not allowed to be empty",
+    "LastNameShort" : "Last Name length must be at least 2 characters long",
+    "LastNameEmpty" : "Last Name is not allowed to be empty",
+    "UsernameShort" : "Username length must be at least 5 characters long",
+    "UsernameEmpty" : "Username is not allowed to be empty",
+    "PhoneNumNumber" : "Phone Number must be a number",
+    "DetailsUpdated" : "Profile details updated!",
+
+    "SettingsUpdated" : "Settings updated!"
+}

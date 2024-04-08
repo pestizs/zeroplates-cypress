@@ -1,0 +1,28 @@
+{
+  "name": "cypress-zeroplates",
+  "version": "1.0.0",
+  "description": "Testing ZeroPlates MERN app.",
+  "author": "N. Pesti",
+  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tsc --noEmit"
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "devDependencies": {
+    "@testing-library/cypress": "^10.0.1",
+    "cypress": "^13.7.1",
+    "cypress-wait-until": "^3.0.1",
+    "eslint-plugin-cypress": "^2.15.1",
+    "pre-commit": "^1.2.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "cypress-real-events": "^1.12.0",
+    "lodash": "^4.17.21",
+    "npm": "^10.4.0",
+    "uuid": "^9.0.1"
+  }
+}
