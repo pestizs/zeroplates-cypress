@@ -15,7 +15,7 @@ This repository contains end-to-end (E2E) tests for my own web-application: Zero
 To get started with this Cypress project, clone the repository and install the necessary dependencies.  
 1. `git clone https://github.com/pestizs/zeroplates-cypress.git` 
 2. Open the folder in a code editor (VsCode)  
-3. In the terminal `npm install`  
+3. In the terminal run `npm install`  
 
 ## Usage
 
