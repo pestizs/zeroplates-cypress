@@ -13,6 +13,7 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-import './commands'
-import "cypress-real-events"
-import "@testing-library/cypress"
+import './commands';
+import "cypress-real-events";
+import "@testing-library/cypress";
+import 'cypress-mochawesome-reporter/register';

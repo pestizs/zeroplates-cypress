@@ -60,7 +60,6 @@ declare namespace Cypress {
     /**
     * Clears browser cache
     */
-    //Need to clear cache, otherwise i get 304 for the intercept, wait. Might be another solution out there.
     clearBrowserCache()
 
     /**

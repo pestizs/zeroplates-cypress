@@ -21,7 +21,6 @@ Cypress.Commands.add('checkTooltip', (elementSelector, tooltipSelector, tooltipT
     .wait(200)
     .get(tooltipSelector, { timeout: timeout })
     .should('have.text', tooltipText)
-  //.should('be.visible') //FLAKY, Sometimes it is not recognising visibility: visible
 });
 
 Cypress.Commands.add("clearBrowserCache", () => {
@@ -81,49 +80,3 @@ Cypress.Commands.add("customRequest", (method, url, headers, body, options = {})
     ...options // Spread any additional options provided
   })
 });
-
-/* Cypress.Commands.add("clickAndSelect", { prevSubject: "element" }, (subject, option) => {
-  // Clear existing value if present
-  cy.get(subject).then(($subject) => {
-    if ($subject.find(".clear-button").length > 0) {
-      cy.wrap($subject).find(".clear-button").click();
-    }
-  });
-
-  // Open dropdown and select option
-  cy.get(subject)
-    .find(".mat-select-arrow-wrapper")
-    .click()
-  cy.contains(".mat-option-text", new RegExp("^ " + Cypress._.escapeRegExp(option) + " $"), { timeout: Cypress.config("timeout") }).click();
-
-  // Verify selected option
-  cy.get(subject).find(".mat-select-value").should("have.text", option);
-
-  // Return the subject for further chaining
-  return cy.wrap(subject);
-}); */
-
-//REFACTORED
-/* Cypress.Commands.add("clickAndSelect", { prevSubject: "element" }, (subject, option) => {
-  // Clear existing value if present
-  cy.get(subject).then(($subject) => {
-    if ($subject.find(".clear-button").length > 0) {
-      cy.wrap($subject).find(".clear-button").click();
-    }
-  });
-
-  // Open dropdown and select option
-  cy.get(subject)
-    .find(".mat-select-arrow-wrapper")
-    .click()
-    .get(".mat-option-text")
-    .contains(new RegExp("^ " + Cypress._.escapeRegExp(option) + " $"), { timeout: Cypress.config("timeout") })
-    .click();
-
-  // Verify selected option
-  cy.get(subject).find(".mat-select-value").should("have.text", option);
-
-  // Return the subject for further chaining
-  return cy.wrap(subject);
-}); */
-

@@ -78,7 +78,6 @@ export function checkNavBar(resoltion) {
 
 /**
  * If the response is undefined, null, or an empty object, globalData is assigned defaultCredentials
- * @param resolution //optional
  */
 export function determineGlobalData(response, defaultCredentials) {
     let globalData;

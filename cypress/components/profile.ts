@@ -6,15 +6,13 @@ const baseUrl = Cypress.config("baseUrl");
 
 let avatar: string;
 
-export async function profileTests(userDetails) {
+export function profileTests(userDetails) {
     cy.intercept("GET", "api/faces", req => {
         //this solves the 304 issue
         delete req.headers['if-none-match']
     }).as("avatars");
     cy.visit(baseUrl + 'profile');
     cy.checkUrl(baseUrl + 'profile')
-
-    const avatarsData = await waitForAvatarsRequest();
 
     cy.get(ProfileSelectors.avatar_profilePage_container).find('img').should(($img) => {
         avatar = $img.attr('src');
@@ -30,7 +28,6 @@ export async function profileTests(userDetails) {
     cy.get(ProfileSelectors.label_phoneNum).should('exist')
     cy.get(ProfileSelectors.label_company).should('exist')
     cy.get(ProfileSelectors.label_aboutme).should('exist')
-
     cy.get(ProfileSelectors.input_email)
         .should('have.attr', 'placeholder', userDetails.email)
         .should('be.disabled')
@@ -49,10 +46,12 @@ export async function profileTests(userDetails) {
     cy.getInput_Type_Check(ProfileSelectors.input_aboutme, 'This is my About me.')
     cy.get(ProfileSelectors.button_changeAvatar).click()
 
-    cy.get(ProfileSelectors.avatar_profilePage_container).find('img').should(($img) => {
-        avatar = $img.attr('src');
-        expect(avatar).to.be.oneOf(Object.values(avatarsData));
-    });
+    waitForAvatarsRequest().then((avatarsData) => {
+        cy.get(ProfileSelectors.avatar_profilePage_container).find('img').should(($img) => {
+            avatar = $img.attr('src');
+            expect(avatar).to.be.oneOf(Object.values(avatarsData));
+        });
+    })
 
     cy.get(ProfileSelectors.button_save).click()
     cy.checkToast(toasts.DetailsUpdated)

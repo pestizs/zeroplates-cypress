@@ -44,14 +44,15 @@ export const registrationNumbers: string[] = [
     '13dl',
     '13dlo',
     'KY58DPE',
+    'KY58DPU',
+    'KY58DPZ',
+    'KY58DPO',
+    'KY58DPV',
 
-    /* 'RJ22HXK',
+    'RJ22HXK',
     'FakeReg1',
     'FakeReg2',
     'FakeReg3',
-    'FakeReg4',
-    'FakeReg5',
-    'FakeReg6', */
 ];
 
 export const firstNames: string[] = ["John", "Jane", "Michael", "Emily", "William",

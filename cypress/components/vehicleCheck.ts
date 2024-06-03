@@ -17,14 +17,41 @@ const regsToExclude = Cypress.env("regsToExclude")
 let selectedNumbers: string[] = getRandomRegistrationNumbers(numberOfRegNums, regsToExclude);
 let savedVehicles: string[] = [];
 
-export async function checkandSaveVehicles() {
+export function checkandSaveVehicles() {
     cy.intercept("POST", "api/vehicle-enquiry/v1/vehicles").as("dvla")
     //runs until there are any vehicles left in selectedNumbers
-    while (selectedNumbers.length > 0) {
-        //Commands and logic is is checkVeh_commands()
-        selectedNumbers = await checkVeh_commands();
+    function saveVehicle() {
+        if (selectedNumbers.length === 0) {
+            cy.log(`**List of Saved vehicles: ${savedVehicles}**`);
+            return; // Exit the recursion if there are no more vehicles
+        }
+
+        cy.getInput_Type_Check(VehicleCheckSelectors.input_search, selectedNumbers[0]);
+        cy.get(VehicleCheckSelectors.button_search).click();
+
+        waitForDVLARequest().then((res) => {
+            if (res.error) {
+                cy.checkToast(toasts.InvalidRegNum);
+                // Remove the first element from selectedNumbers
+                selectedNumbers.shift();
+                saveVehicle(); // Retry with the next vehicle
+            } else {
+                cy.task('setSavedRegNums', [selectedNumbers[0]]);
+                cy.checkToast(toasts.SearchSuccess);
+                cy.get(GlobalSelectors.hearIcon_empty).should('exist').click();
+                cy.checkToast(toasts.VehicleSaved);
+                cy.checkTooltip(GlobalSelectors.hearIcon_full, GlobalSelectors.tooltip_heart, tooltips.fullHearIcon, 500);
+                if (extraValidations) checkVehicleDetails(res, VehicleCheckSelectors);
+                cy.log(`**Saved vehicle: ${res.registrationNumber}**`);
+                // Push the registration number to an array, so we can log them out later.
+                savedVehicles.push(selectedNumbers[0]);
+                // Remove the first element from selectedNumbers
+                selectedNumbers.shift();
+                saveVehicle(); // Continue with the next vehicle
+            }
+        });
     }
-    cy.log(`**List of Saved vehicles: ${savedVehicles}**`)
+    saveVehicle(); // Start the recursion
 }
 
 export function checkEmptyVehCheckPage() {
@@ -61,53 +88,25 @@ export function checkEmptyVehCheckPage() {
     cy.get(VehicleCheckSelectors.label_MotExpires).should('not.exist');
 }
 
-async function checkVeh_commands(): Promise<string[]> {
-    cy.getInput_Type_Check(VehicleCheckSelectors.input_search, selectedNumbers[0])
-    cy.get(VehicleCheckSelectors.button_search).click();
+function waitForDVLARequest(): Cypress.Chainable {
+    let attempts = 0;
+    const maxAttempts = 30; // Maximum number of attempts to wait for the request
 
-    const vehicleDetails = await waitForDVLARequest()
-
-    if (vehicleDetails.error) {
-        cy.checkToast(toasts.InvalidRegNum)
-    } else {
-        cy.task('setSavedRegNums', [selectedNumbers[0]])
-        cy.checkToast(toasts.SearchSuccess)
-        cy.get(GlobalSelectors.hearIcon_empty).should('exist').click()
-        cy.checkToast(toasts.VehicleSaved)
-        cy.checkTooltip(GlobalSelectors.hearIcon_full, GlobalSelectors.tooltip_heart, tooltips.fullHearIcon, 500)
-        if (extraValidations) checkVehicleDetails(vehicleDetails, VehicleCheckSelectors)
-        cy.log(`**Saved vehicle: ${vehicleDetails.registrationNumber}**`)
-        //Push the registration number to an array, so we can log them out later.
-        savedVehicles.push(selectedNumbers[0]);
+    function checkRequest() {
+        return cy.wait("@dvla").then((interception) => {
+            attempts++;
+            if (interception.response.statusCode === 200 || interception.response.statusCode === 500) {
+                const responseBody = interception.response.body;
+                return responseBody;
+            } else if (attempts >= maxAttempts) {
+                throw new Error("Failed to intercept successful DVLA request.");
+            } else {
+                // Retry if the request did not meet the condition
+                return checkRequest();
+            }
+        });
     }
-    // Remove the first element from selectedNumbers
-    selectedNumbers.shift();
-    return selectedNumbers;
-}
-
-async function waitForDVLARequest(): Promise<any> {
-    return new Promise((resolve: any, reject) => {
-        let attempts = 0;
-        const maxAttempts = 30; // Maximum number of attempts to wait for the request
-
-        function checkRequest() {
-            cy.wait("@dvla").then((dvlaResponse: any) => {
-                attempts++;
-                if (dvlaResponse.response.statusCode === 200 || dvlaResponse.response.statusCode === 500) {
-                    const responseBody = dvlaResponse.response.body;
-                    resolve(responseBody);
-                } else if (attempts >= maxAttempts) {
-                    reject(new Error("Failed to intercept successfull dvla request."));
-                } else {
-                    // Retry if the request did not meet the condition
-                    checkRequest();
-                }
-            });
-        }
-
-        // Start checking for the request
-        checkRequest();
-    });
+    return checkRequest();
 }
 
 export function checkVehicleDetails(vehicleDetails: any, VehicleCheckSelectors) {

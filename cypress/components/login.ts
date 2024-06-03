@@ -19,8 +19,8 @@ export function login(email: string, password: string, resolution?: any): void {
     cy.isCheckBoxTicked(LoginSelectors.checkbox_login)
     cy.get(LoginSelectors.button_login)
         .click()
-    cy.wait("@login").then((data) => {
-        expect(data.response.statusCode).to.equal(200);
+    cy.wait("@login").then((res) => {
+        expect(res.response.statusCode).to.equal(200);
     });
 
     cy.checkToast(toasts.LoginSuccess)
@@ -28,7 +28,7 @@ export function login(email: string, password: string, resolution?: any): void {
     cy.checkUrl(baseUrl + 'home')
     checkNavBar(resolution)
 }
-export async function loginValidations(email: string, password: string, resolution?: any): Promise<any> {
+export function loginValidations(email: string, password: string, resolution?: any) {
     cy.intercept("POST", "api/token").as("login");
     cy.visit("/login");
     cy.get(LoginSelectors.button_registerPage).should('exist').click()
@@ -53,8 +53,11 @@ export async function loginValidations(email: string, password: string, resoluti
     cy.isCheckBoxTicked(LoginSelectors.checkbox_login)
     cy.get(LoginSelectors.button_login)
         .click()
-    //Need to await the successfull login response, as there are more than 1
-    await waitForLoginRequest()
+
+    waitForLoginRequest().then((res) => {
+        expect(res.statusCode).to.equal(200);
+    });
+
     cy.checkToast(toasts.LoginSuccess)
     cy.checkLocalStorageToken();
     cy.checkUrl(baseUrl + 'home')
@@ -84,27 +87,23 @@ export function clickLogin_CheckToast(toast): void {
     cy.checkToast(toast)
 }
 
-async function waitForLoginRequest(): Promise<any> {
-    return new Promise((resolve: any, reject) => {
-        let attempts = 0;
-        const maxAttempts = 20; // Maximum number of attempts to wait for the request
+function waitForLoginRequest(): Cypress.Chainable {
+    let attempts = 0;
+    const maxAttempts = 20; // Maximum number of attempts to wait for the request
 
-        function checkRequest() {
-            cy.wait("@login").then((loginResponse: any) => {
-                attempts++;
-                if (loginResponse.response?.statusCode === 200) {
-                    const responseBody = JSON.parse(loginResponse.response.body);
-                    resolve(responseBody);
-                } else if (attempts >= maxAttempts) {
-                    reject(new Error("Failed to intercept successful login request."));
-                } else {
-                    // Retry if the request did not meet the condition
-                    checkRequest();
-                }
-            });
-        }
-
-        // Start checking for the request
-        checkRequest();
-    });
+    function checkRequest() {
+        return cy.wait("@login").then((interception) => {
+            attempts++;
+            if (interception.response.statusCode === 200) {
+                const responseBody = interception.response;
+                return responseBody;
+            } else if (attempts >= maxAttempts) {
+                throw new Error("Failed to intercept successful Register request.");
+            } else {
+                // Retry if the request did not meet the condition
+                return checkRequest();
+            }
+        });
+    }
+    return checkRequest();
 }

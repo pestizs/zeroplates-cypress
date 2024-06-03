@@ -17,20 +17,20 @@ let listOfRoles: string[] = [];
 
 //*******Not using saved selectors, id's, data-cy attributes in this spec intentionally********
 
-export async function representativeTest() {
+export function representativeTest() {
     cy.intercept("GET", "api/faces", req => {
         //this solves the 304 issue
         delete req.headers['if-none-match']
     }).as("avatars");
     cy.visit(baseUrl + 'representatives');
-    const avatarsData = await waitForAvatarsRequest();
-
     basicChecks()
-    //Adding the representatives, Runs 'randomNumber' times
-    addReps(avatarsData, numberofReps)
-    checkScroll()
-    deleteRep()
-    updateRep()
+    waitForAvatarsRequest().then((avatarsData) => {
+        //Adding the representatives, Runs 'randomNumber' times
+        addReps(avatarsData, numberofReps)
+        checkScroll()
+        deleteRep()
+        updateRep()
+    })
     logout()
 }
 

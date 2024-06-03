@@ -4,41 +4,38 @@ import { checkScrollandView, removeSpacesandCompare } from "cypress/support/util
 import { checkVehicleDetails } from "./vehicleCheck";
 const toasts = require("../fixtures/toasts.json");
 
-export async function checkSavedVehicles(savedVehiclesfromNodeStorage: string[]): Promise<any> {
-    const savedVehiclesFromApi = await waitFor_Me_Request()
-    cy.log('**Confirm the number of vehicles we have saved in the previous spec equals the number of vehicles we currently have.**')
-    expect(savedVehiclesFromApi.length).to.eq(savedVehiclesfromNodeStorage.length)
-    checkScrollandView('savedvehicles')
-    checkFiltering(savedVehiclesFromApi)
-    checkPagination(savedVehiclesFromApi, savedVehiclesfromNodeStorage)
-    cy.reload()
-    CheckDetailsOfFirstItem(savedVehiclesFromApi)
-    DeleteFirstItemAndCheck(savedVehiclesFromApi)
+export function checkSavedVehicles(savedVehiclesfromNodeStorage: string[]) {
+    waitFor_Me_Request().then((savedVehiclesFromApi) => {
+        cy.log('**Confirm the number of vehicles we have saved in the previous spec equals the number of vehicles we currently have.**')
+        expect(savedVehiclesFromApi.length).to.eq(savedVehiclesfromNodeStorage.length)
+        checkScrollandView('savedvehicles')
+        checkFiltering(savedVehiclesFromApi)
+        checkPagination(savedVehiclesFromApi, savedVehiclesfromNodeStorage)
+        cy.reload()
+        CheckDetailsOfFirstItem(savedVehiclesFromApi)
+        DeleteFirstItemAndCheck(savedVehiclesFromApi)
+    })
 }
 
-async function waitFor_Me_Request(): Promise<any> {
-    return new Promise((resolve: any, reject) => {
-        let attempts = 0;
-        const maxAttempts = 30; // Maximum number of attempts to wait for the request
+function waitFor_Me_Request(): Cypress.Chainable {
+    let attempts = 0;
+    const maxAttempts = 30; // Maximum number of attempts to wait for the request
 
-        function checkRequest() {
-            cy.wait("@me").then((MeResponse: any) => {
-                attempts++;
-                if (MeResponse.response.statusCode === 200) {
-                    const savedCars = MeResponse.response.body.savedCars;
-                    resolve(savedCars);
-                } else if (attempts >= maxAttempts) {
-                    reject(new Error("Failed to intercept successfull Me request."));
-                } else {
-                    // Retry if the request did not meet the condition
-                    checkRequest();
-                }
-            });
-        }
-
-        // Start checking for the request
-        checkRequest();
-    });
+    function checkRequest() {
+        return cy.wait("@me").then((interception) => {
+            attempts++;
+            if (interception.response.statusCode === 200) {
+                const savedCars = interception.response.body.savedCars;
+                return savedCars;
+            } else if (attempts >= maxAttempts) {
+                throw new Error("Failed to intercept successful Me request.");
+            } else {
+                // Retry if the request did not meet the condition
+                return checkRequest();
+            }
+        });
+    }
+    return checkRequest();
 }
 
 export function checkFiltering(savedVehiclesFromApi) {
@@ -297,5 +294,3 @@ function DeleteFirstItemAndCheck(savedVehiclesFromApi) {
             removeSpacesandCompare(text, savedVehiclesFromApi[1].registrationNumber)
         })
 }
-
-//export async function saveVehiclesViaApiAndCheck()
