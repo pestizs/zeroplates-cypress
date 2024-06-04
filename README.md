@@ -46,5 +46,5 @@ The Cypress tests can be configured using environment variables defined in the `
 ## Reporting
 
 After each headless run, cypress generates a test report which can be found in your cypress folder.  
-Optionally, you can enable or disable screenshots and videos in configurations.  
+Optionally, you can enable or disable screenshots and videos in the configurations.  
 ![cypress artifacts](https://github.com/pestizs/zeroplates-cypress/assets/89751059/1ab8cfe9-6dc8-4d9c-870d-4e644179e5c0)
